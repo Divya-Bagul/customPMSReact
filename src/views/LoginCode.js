@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import logo from "../assets/img/header.jpg";
 import "../assets/css/App.css";
@@ -8,6 +8,8 @@ import { defaults } from "chart.js";
 
 
 function Login(props) {
+  const navigate = useNavigate();
+
   const [email, setemail] = useState('');
   const [password, setpassword] = useState('');
   function addData() {
@@ -22,10 +24,12 @@ function Login(props) {
       }).then((response) => {
         console.log(response);
         sessionStorage.setItem('token', response.token);
-        if(response.token){
-          window.location.href = '/admin/tables';
+        if (response.token) {
+
+          navigate('/admin/user');
+
         }
-        
+
       })
   }
   return (
@@ -34,11 +38,7 @@ function Login(props) {
         <div className="Auth-form-content">
           <h3 className="Auth-form-title ">
             <center>
-              {/* <img
-                src={logo}
-                style={{ height: "50px", width: "100px" }}
-                alt="Image Preview"
-              /> */}
+
               Login Here!!
             </center>
 
@@ -68,7 +68,7 @@ function Login(props) {
             </p>
           </div>
           <p className="text-center mt-2">
-            Forgot <a href="#"> password ? </a>
+            Forgot <Link to='/password'>password ? </Link>
           </p>
         </div>
       </form>

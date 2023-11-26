@@ -17,7 +17,7 @@
 
 */
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import {
   Collapse,
   Navbar,
@@ -44,6 +44,7 @@ function Header(props) {
   const [color, setColor] = React.useState("transparent");
   const sidebarToggle = React.useRef();
   const location = useLocation();
+  const navigation = useNavigate();
   const toggle = () => {
     if (isOpen) {
       setColor("transparent");
@@ -69,6 +70,12 @@ function Header(props) {
     document.documentElement.classList.toggle("nav-open");
     sidebarToggle.current.classList.toggle("toggled");
   };
+  const logout = ()  =>{  
+                
+    
+   
+    sessionStorage.removeItem('token');
+}
   // function that adds color dark/transparent to the navbar on resize (this is for the collapse)
   const updateColor = () => {
     if (window.innerWidth < 993 && isOpen) {
@@ -89,6 +96,7 @@ function Header(props) {
       sidebarToggle.current.classList.toggle("toggled");
     }
   }, [location]);
+ 
   return (
     // add or remove classes depending if we are on full-screen-maps page or not
     <Navbar
@@ -136,12 +144,10 @@ function Header(props) {
             </InputGroup>
           </form>
           <Nav navbar>
-            <NavItem>
-              <Link to="#pablo" className="nav-link btn-magnify">
-                <i className="nc-icon nc-layout-11" />
-                <p>
-                  <span className="d-lg-none d-md-block">Stats</span>
-                </p>
+          <NavItem>
+              <Link to='/login' className="nav-link btn-rotate" onClick={logout}>
+                <i className="nc-icon nc-settings-gear-65" />
+               
               </Link>
             </NavItem>
             <Dropdown

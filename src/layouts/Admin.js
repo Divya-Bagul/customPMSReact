@@ -31,33 +31,51 @@ import routes from "routes.js";
 var ps;
 
 function Dashboard(props) {
+  const [auth, setauth] = React.useState(false);
   const [backgroundColor, setBackgroundColor] = React.useState("black");
   const [activeColor, setActiveColor] = React.useState("info");
-  const mainPanel = React.useRef();
-  const location = useLocation();
   React.useEffect(() => {
-    if (navigator.platform.indexOf("Win") > -1) {
-      ps = new PerfectScrollbar(mainPanel.current);
-      document.body.classList.toggle("perfect-scrollbar-on");
+    if(sessionStorage.getItem('token') != null){
+       setauth(true);
+    }else
+    {
+      setauth(false);
     }
-    return function cleanup() {
+  }, []);
+
+ 
+    const mainPanel = React.useRef();
+    const location = useLocation();
+    React.useEffect(() => {
       if (navigator.platform.indexOf("Win") > -1) {
-        ps.destroy();
+        ps = new PerfectScrollbar(mainPanel.current);
         document.body.classList.toggle("perfect-scrollbar-on");
       }
-    };
-  });
-  React.useEffect(() => {
-    mainPanel.current.scrollTop = 0;
-    document.scrollingElement.scrollTop = 0;
-  }, [location]);
+      return function cleanup() {
+        if (navigator.platform.indexOf("Win") > -1) {
+          ps.destroy();
+          document.body.classList.toggle("perfect-scrollbar-on");
+        }
+      };
+    });
+    React.useEffect(() => {
+      mainPanel.current.scrollTop = 0;
+      document.scrollingElement.scrollTop = 0;
+    }, [location]);
+   
+  
   const handleActiveClick = (color) => {
     setActiveColor(color);
   };
   const handleBgClick = (color) => {
     setBackgroundColor(color);
   };
+ 
   return (
+   <>
+   
+    { 
+      (auth == true) ? (
     <div className="wrapper">
        
       <Sidebar
@@ -88,8 +106,12 @@ function Dashboard(props) {
         handleActiveClick={handleActiveClick}
         handleBgClick={handleBgClick}
       />
-    </div>
+    </div>): ( <div  className="text-center text-light" style={{marginTop:"350px"}} ref={mainPanel}><h1>Access Denied</h1>     Login <Link to='/login'>Here ? </Link>
+ 
+     </div>)}
+  </>
   );
+
 }
 
 export default Dashboard;

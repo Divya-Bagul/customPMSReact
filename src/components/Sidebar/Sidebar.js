@@ -71,8 +71,8 @@ function Sidebar(props) {
       </div>
       <div className="sidebar-wrapper" ref={sidebar}>
         <Nav>
-         
-               
+    
+
           {props.routes.map((prop, key) => {
             return (
               <li

@@ -28,149 +28,343 @@ import {
   Table,
   Row,
   Col,
-  Button,
+
 } from "reactstrap";
-
+import { Modal, Button } from 'react-bootstrap';
+import { json } from "react-router-dom";
+import Swal from "sweetalert2";
+import DataTable from "react-data-table-component";
 function Tables() {
-    const [userdata,setuserdata] = useState([]);
-    const[responseData,setresponse] = useState('');
+  const [userdata, setuserdata] = useState([]);
+  const [filterData, setfilterData] = useState([]);
+
+  const [responseData, setresponse] = useState('');
+  const [editdata, seteditdata] = useState([]);
+  const [name, setname] = useState('');
+
+  const [email, setemail] = useState('');
+  const [number, setnumber] = useState('');
+
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+  const [search,setsearch] = useState();
+  const [auth, setauth] = useState(false);
+
   useEffect(() => {
-    showdata();
-}, []);
+    if(sessionStorage.getItem('token') != null){
+       setauth(true);
+       showdata();
+    }else
+    {
+      setauth(false);
+    }
+  }, []);
+  function showAlert() {
+    Swal.fire({
+      title: "Success",
+      text: "Data Save Successfully",
+      icon: "success",
+      confirmButtonText: "OK",
+    });
+  }
+  function showdata(id = undefined) {
 
-function showdata(){
+    if (id != undefined) {
+      handleShow();
+      fetch(`http://localhost:5000/userdata/${id}`, {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+          'authorization': sessionStorage.getItem('token')
+        },
+      })
+        .then((Response) => {
+          return Response.json();
+        }).then((response) => {
+          if (response.status == 200) {
+            seteditdata(response.data);
+            setfilterData(response.data);
+          } else {
 
-  fetch('http://localhost:5000/userdata', {
-    method: "GET",
-    headers: { 'Content-Type': 'application/json',
-               'authorization':sessionStorage.getItem('token') },
-  })
-    .then((Response) => {
-      return Response.json();
-    }).then((response) => {
-      console.log(response.status);
-      if(response.status == 200){
+          }
+        });
+    } else {
+      fetch('http://localhost:5000/userdata', {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+          'authorization': sessionStorage.getItem('token')
+        },
+      })
+        .then((Response) => {
+          return Response.json();
+        }).then((response) => {
+          if (response.status == 200) {
+            setuserdata(response.data);
+            setfilterData(response.data);
+          } else {
+            setresponse(response.data);
+          }
+        })
+    }
+
+
+
+  }
+
+  const columns = [
+    {
+        name: 'id',
+        selector: row => row._id,
+        sortable : true
+    },
+    {
+      name: 'name',
+      selector: row => row.name,
+      sortable : true
+    },
+    {
+        name: 'email',
+        selector: row => row.email,
+        sortable : true
+    },
+    {
+      name: 'Number',
+      selector: row => row.phone,
+      sortable : true
+    },
+    {
+      name: 'Action',
+      selector: row =>  (<td><Button variant="secondary" onClick={() => showdata(row._id)}>Edit</Button> ,<Button variant="danger" onClick={() => deleteUser(row._id)}>Delete</Button> </td>)
       
-        setuserdata(response.data);
-      }else{
-        setresponse(response.data);
-      }
+    },
+];
 
+  function updateuser(id) {
+    fetch(`http://localhost:5000/update/${id}`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': sessionStorage.getItem('token')
+      },
+      body: JSON.stringify({ name: name, email: email, phone: number })
     })
-}
-
-
+      .then((Response) => {
+        return Response.json();
+      }).then((response) => {
+        if (response.status == 200) {
+          showdata();
+          handleClose();
+          showAlert();
+          seteditdata([]);
+        } else {
+          handleClose();
+          seteditdata([]);
+        }
+      });
+  }
+  function addUser(id) {
+    fetch('http://localhost:5000/create', {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': sessionStorage.getItem('token')
+      },
+      body: JSON.stringify({ name: name, email: email, phone: number })
+    })
+      .then((Response) => {
+        return Response.json();
+      }).then((response) => {
+        if (response.status == 200) {
+          showdata();
+          handleClose();
+          showAlert();
+          seteditdata([]);
+        } else {
+          handleClose();
+          seteditdata([]);
+        }
+      });
+  }
+  function deleteUser(id) {
+    fetch(`http://localhost:5000/delete/${id}`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': sessionStorage.getItem('token')
+      },
+      
+    })
+      .then((Response) => {
+        return Response.json();
+      }).then((response) => {
+        if (response.status == 200) {
+          showdata();
+          handleClose();
+          showAlert();
+          seteditdata([]);
+        } else {
+          handleClose();
+          seteditdata([]);
+        }
+      });
+  }
+  useEffect(() => {
+    console.log(search);
+          const searchData = userdata.filter(item =>{
+            return item.name.match(search);
+          });
+          setfilterData(searchData);
+  }, [search]);
   return (
     <>
-      <div className="content">
+    { auth == true ?   (<div className="content">
         <Row>
           <Col lg="12">
             <Card>
               <CardHeader>
                 <CardTitle tag="h4">User Data</CardTitle>
-                <Button>Create User</Button>
+                <Button onClick={handleShow}>Create User</Button>
               </CardHeader>
-              
+
               <CardBody>
                 <Table responsive>
-                <thead className="text-primary">
+
+                  <DataTable 
+                      columns={columns}
+                      data={filterData}
+                      pagination
+                      selectableRows
+                      highlightOnHover
+                      subHeader
+                      subHeaderComponent={
+                        <input type="search" placeholder="Search" className="w-25 form-control" onChange={(e) => setsearch(e.target.value)}
+                        />
+                      }
+                      subHeaderAlign="right"
+                    >
+
+
+                  </DataTable>
+                  {/* <thead className="text-primary">
                     <tr>
                       <th>Id</th>
                       <th>Name</th>
                       <th>Email</th>
-                      
-                      
-                    </tr>
-                  </thead>
-                  <tbody>
-               { responseData == '' ? 
-                (userdata.map(value => {
-                      return(
-                        <>
+                      <th>Number</th>
 
-                          <tr key={value._id}>
-                          <td>{value._id}</td>
-                            <td>{value.name}</td>
-                            <td>{value.email}</td>
-                            
-                          </tr>
-                        </>
-                      )
-                  })) : ( <h1> {responseData} </h1>)
-                }
-                </tbody>
+
+                    </tr>
+                  </thead> */}
+                  {/* <tbody>
+                    {responseData == '' ?
+                      (userdata.map(value => {
+                        return (
+                          <>
+
+                            <tr key={value._id}>
+                              <td>{value._id}</td>
+                              <td>{value.name}</td>
+                              <td>{value.email}</td>
+                              <td>{value.phone}</td>
+                              <td><Button variant="secondary" onClick={() => showdata(value._id)}>Edit</Button></td>
+                              <td><Button variant="danger" onClick={() => deleteUser(value._id)}>Edit</Button></td>
+                            </tr>
+                          </>
+                        )
+                      })) : (<h1> {responseData} </h1>)
+                    }
+                  </tbody> */}
                 </Table>
               </CardBody>
             </Card>
           </Col>
-          <Col md="12">
-            <Card className="card-plain">
-              <CardHeader>
-                <CardTitle tag="h4">Table on Plain Background</CardTitle>
-                <p className="card-category">
-                  Here is a subtitle for this table
-                </p>
-              </CardHeader>
-              <CardBody>
-                <Table responsive>
-                  <thead className="text-primary">
-                    <tr>
-                      <th>Name</th>
-                      <th>Country</th>
-                      <th>City</th>
-                      <th className="text-right">Salary</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Dakota Rice</td>
-                      <td>Niger</td>
-                      <td>Oud-Turnhout</td>
-                      <td className="text-right">$36,738</td>
-                    </tr>
-                    <tr>
-                      <td>Minerva Hooper</td>
-                      <td>Curaçao</td>
-                      <td>Sinaai-Waas</td>
-                      <td className="text-right">$23,789</td>
-                    </tr>
-                    <tr>
-                      <td>Sage Rodriguez</td>
-                      <td>Netherlands</td>
-                      <td>Baileux</td>
-                      <td className="text-right">$56,142</td>
-                    </tr>
-                    <tr>
-                      <td>Philip Chaney</td>
-                      <td>Korea, South</td>
-                      <td>Overland Park</td>
-                      <td className="text-right">$38,735</td>
-                    </tr>
-                    <tr>
-                      <td>Doris Greene</td>
-                      <td>Malawi</td>
-                      <td>Feldkirchen in Kärnten</td>
-                      <td className="text-right">$63,542</td>
-                    </tr>
-                    <tr>
-                      <td>Mason Porter</td>
-                      <td>Chile</td>
-                      <td>Gloucester</td>
-                      <td className="text-right">$78,615</td>
-                    </tr>
-                    <tr>
-                      <td>Jon Porter</td>
-                      <td>Portugal</td>
-                      <td>Gloucester</td>
-                      <td className="text-right">$98,615</td>
-                    </tr>
-                  </tbody>
-                </Table>
-              </CardBody>
-            </Card>
-          </Col>
+
+     
         </Row>
-      </div>
+
+        <Modal show={show} onHide={handleClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>Modal heading</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {
+              editdata.map(item =>
+                <div className="form-group mt-3" key={item._id}>
+                  <label> Name </label>
+                  <input
+                    type="text"
+                    className="form-control mt-1"
+                    placeholder="Enter Name"
+                    defaultValue={item.name} onChange={(e) => setname(e.target.value)}
+                  />
+
+                  <input
+                    type="text"
+                    className="form-control mt-1"
+                    placeholder="Enter Email Address"
+                    defaultValue={item.email} onChange={(e) => setemail(e.target.value)}
+                  />
+
+                  <input
+                    type="text"
+                    className="form-control mt-1"
+                    placeholder="Enter Mobile Number"
+                    defaultValue={item.phone} onChange={(e) => setnumber(e.target.value)}
+                  />
+                  <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                      Close
+                    </Button>
+                    <Button variant="primary" onClick={() => updateuser(item._id)}>
+                      Save Changes
+                    </Button>
+                  </Modal.Footer>
+                </div>
+              )}
+
+           {editdata.length == 0 ?( 
+            
+             
+            <div className="form-group mt-3" >
+                  <label> Name </label>
+                  <input
+                    type="text"
+                    className="form-control mt-1"
+                    placeholder="Enter Name"
+                     onChange={(e) => setname(e.target.value)}
+                  />
+
+                  <input
+                    type="text"
+                    className="form-control mt-1"
+                    placeholder="Enter Email Address"
+                     onChange={(e) => setemail(e.target.value)}
+                  />
+
+                  <input
+                    type="text"
+                    className="form-control mt-1"
+                    placeholder="Enter Mobile Number"
+                     onChange={(e) => setnumber(e.target.value)}
+                  />
+                  <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                      Close
+                    </Button>
+                    <Button variant="primary" onClick={addUser} >
+                        Add User
+                    </Button>
+                  </Modal.Footer>
+                </div>) : (<h5></h5>)}
+          </Modal.Body>
+        </Modal >
+      </div >)   : (<div className="content">
+        <Row>
+          <Col lg="12">
+            <Card><h1>Access Denied</h1></Card></Col> </Row></div>)}
     </>
   );
 }
