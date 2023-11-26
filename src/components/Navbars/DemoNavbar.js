@@ -146,7 +146,7 @@ function Header(props) {
           <Nav navbar>
           <NavItem>
               <Link to='/login' className="nav-link btn-rotate" onClick={logout}>
-                <i className="nc-icon nc-settings-gear-65" />
+                <i className="nc-icon nc-button-power" />
                
               </Link>
             </NavItem>

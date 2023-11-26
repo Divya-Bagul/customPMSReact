@@ -29,6 +29,10 @@ import "perfect-scrollbar/css/perfect-scrollbar.css";
 
 import AdminLayout from "layouts/Admin.js";
 import LoginPage from "views/LoginCode";
+import ForgetPass from "views/ForgetPass";
+import PasswordChange from "views/PasswordChange";
+
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
@@ -38,7 +42,8 @@ root.render(
       <Route path="/admin/*" element={<AdminLayout />} />
       <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
       <Route path="/Login" element={<LoginPage/>} />
-
+      <Route path="/forgetpass" element={<ForgetPass/>} />
+      <Route path="/forgetpasschange" element={<PasswordChange/>} />
     </Routes>
   </BrowserRouter>
   </React.StrictMode>

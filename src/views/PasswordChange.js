@@ -4,32 +4,35 @@ import Button from "react-bootstrap/Button";
 import logo from "../assets/img/header.jpg";
 import "../assets/css/App.css";
 import { defaults } from "chart.js";
-
 import Swal from "sweetalert2";
 
-function Login(props) {
+
+function PasswordChange(props) {
   const navigate = useNavigate();
 
   const [email, setemail] = useState('');
   const [password, setpassword] = useState('');
-  function addData() {
+  function SubmitEmail() {
 
-    fetch('http://localhost:5000/login', {
+    fetch('http://localhost:5000/mail', {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, password: password })
+      body: JSON.stringify({ usermail: email,password:password })
     })
       .then((Response) => {
         return Response.json();
       }).then((response) => {
         console.log(response);
-        sessionStorage.setItem('token', response.token);
-        if (response.token) {
+        if(response.status == 200){
+           Swal.fire({
+            title: "Success",
+            text: "password Chnage successfully",
+            icon: "success",
+            confirmButtonText: "OK",
+          });
+          navigate('/login');
 
-          navigate('/admin/user');
-
-        }else{
-          console.warn(response);
+        }else if(response.status == 500){
           Swal.fire({
             title: "Oops",
             text: response.data,
@@ -37,7 +40,6 @@ function Login(props) {
             confirmButtonText: "OK",
           });
         }
-
       })
   }
   return (
@@ -47,7 +49,7 @@ function Login(props) {
           <h3 className="Auth-form-title ">
             <center>
 
-              Login Here!!
+              Forget Password!!
             </center>
 
           </h3>
@@ -71,16 +73,16 @@ function Login(props) {
             />
           </div>
           <div className="d-grid gap-2 mt-3">
-            <p className="btn btn-primary" onClick={(e) => addData()} >
-              Login
+            <p className="btn btn-primary" onClick={(e) => SubmitEmail()} >
+              Submit
             </p>
           </div>
           <p className="text-center mt-2">
-            Forgot <Link to='/forgetpass'>password ? </Link>
+            Back to <Link to='/login'>Login ? </Link>
           </p>
         </div>
       </form>
     </div>
   );
 }
-export default Login;
+export default PasswordChange;
