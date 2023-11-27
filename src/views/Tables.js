@@ -34,6 +34,9 @@ import { Modal, Button } from 'react-bootstrap';
 import { json } from "react-router-dom";
 import Swal from "sweetalert2";
 import DataTable from "react-data-table-component";
+import ReactPaginate from "react-paginate";
+import { useRef } from "react";
+
 function Tables() {
   const [userdata, setuserdata] = useState([]);
   const [filterData, setfilterData] = useState([]);
@@ -46,12 +49,15 @@ function Tables() {
   const [number, setnumber] = useState('');
 
   const [show, setShow] = useState(false);
+  const currentPage=useRef();
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [search,setsearch] = useState();
   const [auth, setauth] = useState(false);
-
+  const [paginationList, setPaginationList] = useState('');
+  const[limitdata,setlimitdata] = useState(2);
+  
   useEffect(() => {
     if(sessionStorage.getItem('token') != null){
        setauth(true);
@@ -60,6 +66,7 @@ function Tables() {
     {
       setauth(false);
     }
+    currentPage.current = 1;
   }, []);
   function showAlert() {
     Swal.fire({
@@ -70,11 +77,11 @@ function Tables() {
     });
   }
   function showdata(id = undefined) {
-
+    
     if (id != undefined) {
       handleShow();
       fetch(`http://localhost:5000/userdata/${id}`, {
-        method: "GET",
+        method: "POST",
         headers: {
           'Content-Type': 'application/json',
           'authorization': sessionStorage.getItem('token')
@@ -92,18 +99,24 @@ function Tables() {
         });
     } else {
       fetch('http://localhost:5000/userdata', {
-        method: "GET",
+        method: "POST",
         headers: {
           'Content-Type': 'application/json',
           'authorization': sessionStorage.getItem('token')
         },
+        body:JSON.stringify({page:currentPage.current,limit:limitdata})
       })
         .then((Response) => {
           return Response.json();
         }).then((response) => {
           if (response.status == 200) {
+            // custom pagination
+            setPaginationList(response.result.paginationList)
             setuserdata(response.data);
+            //end custom pagination
             setfilterData(response.data);
+           
+            
           } else {
             setresponse(response.data);
           }
@@ -113,7 +126,11 @@ function Tables() {
 
 
   }
-
+  function handlePageClick(e) {
+    console.log(e.selected +1);
+    currentPage.current = e.selected +1;
+    showdata();
+  }
   const columns = [
     {
         name: 'id',
@@ -218,6 +235,11 @@ function Tables() {
           });
           setfilterData(searchData);
   }, [search]);
+
+  useEffect(() => {
+    showdata();
+          
+  }, [limitdata]);
   return (
     <>
     { auth == true ?   (<div className="content">
@@ -248,7 +270,11 @@ function Tables() {
 
 
                   </DataTable>
-                  {/* <thead className="text-primary">
+                  
+                </Table>
+              </CardBody>
+              <table>
+              <thead className="text-primary">
                     <tr>
                       <th>Id</th>
                       <th>Name</th>
@@ -257,8 +283,9 @@ function Tables() {
 
 
                     </tr>
-                  </thead> */}
-                  {/* <tbody>
+                  </thead> 
+                  <tbody>
+                    <input type="text" onChange={(e)=>setlimitdata(e.target.value)} />
                     {responseData == '' ?
                       (userdata.map(value => {
                         return (
@@ -276,9 +303,27 @@ function Tables() {
                         )
                       })) : (<h1> {responseData} </h1>)
                     }
-                  </tbody> */}
-                </Table>
-              </CardBody>
+                  </tbody> 
+              </table>
+              <ReactPaginate
+            breakLabel="..."
+            nextLabel="next >"
+            onPageChange={handlePageClick}
+            pageRangeDisplayed={5}
+            pageCount={paginationList}
+            previousLabel="< previous"
+            renderOnZeroPageCount={null}
+            marginPagesDisplayed={"450px"}
+            containerClassName="pagination justify-content-center"
+            pageClassName="page-item"
+            pageLinkClassName="page-link"
+            previousClassName="page-item"
+            previousLinkClassName="page-link"
+            nextClassName="page-item"
+            nextLinkClassName="page-link"
+            activeClassName="active"
+            forcePage={currentPage.current-1}
+          />
             </Card>
           </Col>
 
