@@ -237,7 +237,13 @@ function Tables() {
   }, [search]);
 
   useEffect(() => {
-    showdata();
+    if(limitdata == 0 || limitdata == ''){
+      setlimitdata(2);
+      showdata();
+    }else{
+      showdata();
+    }
+    
           
   }, [limitdata]);
   return (
