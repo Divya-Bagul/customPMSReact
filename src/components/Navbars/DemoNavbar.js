@@ -72,8 +72,6 @@ function Header(props) {
   };
   const logout = ()  =>{  
                 
-    
-   
     sessionStorage.removeItem('token');
 }
   // function that adds color dark/transparent to the navbar on resize (this is for the collapse)
@@ -145,7 +143,7 @@ function Header(props) {
           </form>
           <Nav navbar>
           <NavItem>
-              <Link to='/login' className="nav-link btn-rotate" onClick={logout}>
+              <Link to='/login' className="nav-link btn-rotate" title="Logout" onClick={logout}>
                 <i className="nc-icon nc-button-power" />
                
               </Link>

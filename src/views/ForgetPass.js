@@ -5,9 +5,6 @@ import logo from "../assets/img/header.jpg";
 import "../assets/css/App.css";
 import Swal from "sweetalert2";
 
-
-
-
 function ForgetPass(props) {
   const navigate = useNavigate();
   const [email, setemail] = useState('');
@@ -52,7 +49,7 @@ function ForgetPass(props) {
            
           </h3>
           <p className="text-center mt-2">
-            Back to <Link to='/forgetpass'>Login ? </Link>
+            Back to <Link to='/login'>Login ? </Link>
           </p>
           <div className="form-group mt-3">
             <label> Email address </label>

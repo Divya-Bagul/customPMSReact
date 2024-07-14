@@ -17,7 +17,6 @@
 
 */
 
-
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
@@ -31,7 +30,7 @@ import AdminLayout from "layouts/Admin.js";
 import LoginPage from "views/LoginCode";
 import ForgetPass from "views/ForgetPass";
 import PasswordChange from "views/PasswordChange";
-
+import CyberComp from "views/CyberComp";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -39,11 +38,14 @@ root.render(
   <React.StrictMode>
   <BrowserRouter>
     <Routes>
+
       <Route path="/admin/*" element={<AdminLayout />} />
-      <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+      <Route path="/admin/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
       <Route path="/Login" element={<LoginPage/>} />
       <Route path="/forgetpass" element={<ForgetPass/>} />
       <Route path="/forgetpasschange" element={<PasswordChange/>} />
+      <Route path="/" element={<CyberComp/>} />
+
     </Routes>
   </BrowserRouter>
   </React.StrictMode>

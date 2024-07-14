@@ -19,7 +19,7 @@
 import Dashboard from "views/Dashboard.js";
 import Notifications from "views/Notifications.js";
 import Icons from "views/Icons.js";
-import Typography from "views/Typography.js";
+import ComplaintList from "views/ComplaintList.js";
 import TableList from "views/Tables.js";
 import Maps from "views/Map.js";
 import UserPage from "views/User.js";
@@ -75,13 +75,13 @@ var routes = [
     component: <TableList />,
     layout: "/admin",
   },
-  // {
-  //   path: "/typography",
-  //   name: "Typography",
-  //   icon: "nc-icon nc-caps-small",
-  //   component: <Typography />,
-  //   layout: "/admin",
-  // },
+  {
+    path: "/complaintes",
+    name: "Complaints List",
+    icon: "nc-icon nc-tile-56",
+    component: <ComplaintList />,
+    layout: "/admin",
+  },
   // {
   //   pro: true,
   //   path: "/upgrade",

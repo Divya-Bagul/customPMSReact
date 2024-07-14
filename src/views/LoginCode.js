@@ -10,25 +10,23 @@ import Swal from "sweetalert2";
 function Login(props) {
   const navigate = useNavigate();
 
-  const [email, setemail] = useState('');
-  const [password, setpassword] = useState('');
+  const [email, setemail] = useState("");
+  const [password, setpassword] = useState("");
   function addData() {
-
-    fetch('http://localhost:5000/login', {
+    fetch("http://localhost:5000/login", {
       method: "POST",
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, password: password })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email, password: password }),
     })
-      .then((Response) => {
+    .then((Response) => {
         return Response.json();
-      }).then((response) => {
-        console.log(response);
-        sessionStorage.setItem('token', response.token);
-        if (response.token) {
-
-          navigate('/admin/user');
-
-        }else{
+    })
+    .then((response) => {
+      console.log(response);
+      sessionStorage.setItem("token", response.token);
+      if (response.token) {
+        navigate("/admin/user");
+      } else {
           console.warn(response);
           Swal.fire({
             title: "Oops",
@@ -37,19 +35,20 @@ function Login(props) {
             confirmButtonText: "OK",
           });
         }
-
-      })
+      });
   }
   return (
+    <>
+    <div className=" d-flex justify-content-end">
+    <p className="text-end btn text-light mt-2 ">
+    If you have Cyber Complaint <Link to='/'>Add Complaint ? </Link></p>
+    </div>
     <div className="Auth-form-container">
+      
       <form className="Auth-form">
         <div className="Auth-form-content">
           <h3 className="Auth-form-title ">
-            <center>
-
-              Login Here!!
-            </center>
-
+            <center>Login Here!!</center>
           </h3>
 
           <div className="form-group mt-3">
@@ -71,16 +70,18 @@ function Login(props) {
             />
           </div>
           <div className="d-grid gap-2 mt-3">
-            <p className="btn btn-primary" onClick={(e) => addData()} >
+            <p className="btn btn-primary" onClick={(e) => addData()}>
               Login
             </p>
           </div>
           <p className="text-center mt-2">
-            Forgot <Link to='/forgetpass'>password ? </Link>
+            Forgot <Link to="/forgetpass">password ? </Link>
           </p>
         </div>
       </form>
     </div>
+    </>
+    
   );
 }
 export default Login;
